@@ -21,8 +21,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cleanup.todoc.R;
-import com.cleanup.todoc.model.Project;
-import com.cleanup.todoc.model.Task;
+import com.cleanup.todoc.models.Project;
+import com.cleanup.todoc.models.Task;
 
 import java.util.Collections;
 import java.util.Date;
@@ -39,6 +39,9 @@ import butterknife.ButterKnife;
  */
 public class MainActivity extends AppCompatActivity implements TasksAdapter.DeleteTaskListener {
 
+    /**
+     * ViewModel de la MainActivity.
+     */
     private MainActivityViewModel mainActivityViewModel;
 
     /**
@@ -62,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
      * EditText that allows user to set the name of a task
      */
     @Nullable
-//    @BindView(R.id.txt_task_name)
     private EditText dialogEditText;
 
     /**
@@ -96,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
 
         ButterKnife.bind(this);
 
-        this.mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        this.mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class); // TODO: Créer une factory
 
         this.listTasks.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         this.tasksAdapter = new TasksAdapter(this, this.mainActivityViewModel);

@@ -1,4 +1,4 @@
-package com.cleanup.todoc.model;
+package com.cleanup.todoc.models;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;

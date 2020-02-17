@@ -9,8 +9,8 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import com.cleanup.todoc.model.Project;
-import com.cleanup.todoc.model.Task;
+import com.cleanup.todoc.models.Project;
+import com.cleanup.todoc.models.Task;
 
 import java.util.UUID;
 
@@ -30,13 +30,22 @@ public abstract class AppDataBase extends RoomDatabase {
      */
     private static AppDataBase appDataBaseInstance;
 
-
+    /**
+     * Permet de récupérer la DAO des tâches.
+     *
+     * @return la DAO des tâches
+     */
     public abstract TaskDao taskDao();
 
+    /**
+     * Permet de récupérer la DAO des projets.
+     *
+     * @return la DAO des projets
+     */
     public abstract ProjectDao projectDao();
 
     /**
-     * Constructeur static.
+     * Constructeur static permettant de récupérer l'instance de la BDD.
      *
      * @param pContext context de l'application
      * @return l'instance de la base de données
@@ -56,6 +65,9 @@ public abstract class AppDataBase extends RoomDatabase {
         return appDataBaseInstance;
     }
 
+    /**
+     * Création d'un CallBack appelé lors de l'instanciation de {@link AppDataBase}.
+     */
     private static RoomDatabase.Callback callback = new Callback() {
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
@@ -65,13 +77,12 @@ public abstract class AppDataBase extends RoomDatabase {
     };
 
     /**
-     * Remplit la base de données en arrière plan.
+     * Classe permettant l'initialisation de la BDD de manière asynchrone.
      */
     private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
 
         private final TaskDao taskDao;
         private final ProjectDao projectDao;
-
 
         PopulateDbAsync(AppDataBase db) {
             this.taskDao = db.taskDao();
