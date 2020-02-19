@@ -1,9 +1,7 @@
 package com.cleanup.todoc.ui;
 
-import android.app.Application;
-
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModel;
 
 import com.cleanup.todoc.models.Project;
 import com.cleanup.todoc.models.Task;
@@ -18,17 +16,22 @@ import lombok.Getter;
 /**
  * ViewModel de la {@link MainActivity}.
  */
-public class MainActivityViewModel extends AndroidViewModel {
+public class MainActivityViewModel extends ViewModel {
 
     /**
      * Repository des tâches.
      */
-    private TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
 
     /**
      * Repository des projets.
      */
-    private ProjectRepository projectRepository;
+    private final ProjectRepository projectRepository;
+
+    /**
+     * Permet l'éxecution de manière asynchrone des requêtes en BDD.
+     */
+    private final Executor executor;
 
     /**
      * Liste des tâches.
@@ -42,18 +45,12 @@ public class MainActivityViewModel extends AndroidViewModel {
     @Getter
     private LiveData<List<Project>> projects;
 
-    /**
-     * Permet l'éxecution de manière asynchrone des requêtes en BDD.
-     */
-    private final Executor executor;
-
-    public MainActivityViewModel(Application application, Executor pExecutor) {
-        super(application);
-        this.taskRepository = new TaskRepository(application);
-        this.projectRepository = new ProjectRepository(application);
+    public MainActivityViewModel(TaskRepository pTaskRepository, ProjectRepository pProjectRepository, Executor pExecutor) {
+        this.taskRepository = pTaskRepository;
+        this.projectRepository = pProjectRepository;
+        this.executor = pExecutor;
         this.tasks = taskRepository.getTasks();
         this.projects = projectRepository.getProjects();
-        this.executor = pExecutor;
     }
 
     /**

@@ -1,6 +1,6 @@
 package com.cleanup.todoc.repositories;
 
-import android.app.Application;
+import android.content.Context;
 
 import androidx.lifecycle.LiveData;
 
@@ -28,8 +28,8 @@ public class ProjectRepository {
     @Getter
     private LiveData<List<Project>> projects;
 
-    public ProjectRepository(Application application) {
-        this.projectDao = AppDataBase.getInstance(application).projectDao();
+    public ProjectRepository(Context pContext) {
+        this.projectDao = AppDataBase.getInstance(pContext).projectDao();
         this.projects = projectDao.getProjects();
     }
 

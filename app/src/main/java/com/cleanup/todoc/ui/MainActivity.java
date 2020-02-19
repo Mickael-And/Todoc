@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cleanup.todoc.R;
+import com.cleanup.todoc.injections.Injection;
 import com.cleanup.todoc.models.Project;
 import com.cleanup.todoc.models.Task;
 
@@ -98,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
 
         ButterKnife.bind(this);
 
-        this.mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class); // TODO: Créer une factory
+        this.mainActivityViewModel = new ViewModelProvider(this, Injection.provideViewModelFactory(this)).get(MainActivityViewModel.class);
 
         this.listTasks.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         this.tasksAdapter = new TasksAdapter(this, this.mainActivityViewModel);
