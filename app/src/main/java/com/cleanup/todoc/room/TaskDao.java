@@ -11,6 +11,11 @@ import com.cleanup.todoc.models.Task;
 
 import java.util.List;
 
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
+
 /**
  * Dao des données de type {@link com.cleanup.todoc.models.Task}
  */
@@ -23,7 +28,7 @@ public interface TaskDao {
      * @param tasks tâches à insérer
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertTask(Task... tasks);
+    Single<List<Long>> insertTask(Task... tasks);
 
     /**
      * Permet la suppression d'une ou plusieurs tâches en BDD.
@@ -31,13 +36,7 @@ public interface TaskDao {
      * @param tasks tâches à supprimer
      */
     @Delete
-    void deleteTask(Task... tasks);
-
-    /**
-     * Requête de suppression des tâches en BDD.
-     */
-    @Query("DELETE FROM task")
-    void deleteAllTasks();
+    Single<Integer> deleteTask(Task... tasks);
 
     /**
      * Requête pour la récupération de la liste des tâches en BDD sous forme observable.

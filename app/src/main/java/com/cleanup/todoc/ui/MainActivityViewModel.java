@@ -9,8 +9,9 @@ import com.cleanup.todoc.repositories.ProjectRepository;
 import com.cleanup.todoc.repositories.TaskRepository;
 
 import java.util.List;
-import java.util.concurrent.Executor;
 
+import io.reactivex.Maybe;
+import io.reactivex.Single;
 import lombok.Getter;
 
 /**
@@ -29,9 +30,10 @@ public class MainActivityViewModel extends ViewModel {
     private final ProjectRepository projectRepository;
 
     /**
-     * Permet l'éxecution de manière asynchrone des requêtes en BDD.
+     * Liste des projets.
      */
-    private final Executor executor;
+    @Getter
+    private LiveData<List<Project>> projects;
 
     /**
      * Liste des tâches.
@@ -39,36 +41,31 @@ public class MainActivityViewModel extends ViewModel {
     @Getter
     private LiveData<List<Task>> tasks;
 
-    /**
-     * Miste des projets.
-     */
-    @Getter
-    private LiveData<List<Project>> projects;
-
-    public MainActivityViewModel(TaskRepository pTaskRepository, ProjectRepository pProjectRepository, Executor pExecutor) {
+    public MainActivityViewModel(TaskRepository pTaskRepository, ProjectRepository pProjectRepository) {
         this.taskRepository = pTaskRepository;
         this.projectRepository = pProjectRepository;
-        this.executor = pExecutor;
-        this.tasks = taskRepository.getTasks();
-        this.projects = projectRepository.getProjects();
+        this.tasks = this.taskRepository.getTasks();
+        this.projects = this.projectRepository.getProjects();
     }
 
     /**
      * Insère une ou plusieurs tâches à la liste des tâches.
      *
      * @param task tâches à insérer
+     * @return la liste des identifiants des tâches insérées en BDD
      */
-    void insertTask(Task task) {
-        executor.execute(() -> this.taskRepository.insertTask(task));
+    Single<List<Long>> insertTask(Task task) {
+        return this.taskRepository.insertTask(task);
     }
 
     /**
      * Supprime une ou plusieurs tâches de la liste des tâches.
      *
      * @param tasks tâches à supprimer.
+     * @return le nombre de tâche(s) supprimée(s)
      */
-    void deleteTask(Task... tasks) {
-        executor.execute(() -> this.taskRepository.deleteTask(tasks));
+    Single<Integer> deleteTask(Task... tasks) {
+        return this.taskRepository.deleteTask(tasks);
     }
 
     /**
@@ -77,7 +74,7 @@ public class MainActivityViewModel extends ViewModel {
      * @param projectId identifiant du projet à récupérer
      * @return projet récupéré
      */
-    Project getProject(String projectId) {
+    Maybe<Project> getProject(String projectId) {
         return this.projectRepository.getProject(projectId);
     }
 }

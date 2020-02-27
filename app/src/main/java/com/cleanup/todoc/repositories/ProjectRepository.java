@@ -10,6 +10,8 @@ import com.cleanup.todoc.room.ProjectDao;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import lombok.Getter;
 
 /**
@@ -30,7 +32,7 @@ public class ProjectRepository {
 
     public ProjectRepository(Context pContext) {
         this.projectDao = AppDataBase.getInstance(pContext).projectDao();
-        this.projects = projectDao.getProjects();
+        this.projects = this.projectDao.getProjects();
     }
 
     /**
@@ -39,7 +41,7 @@ public class ProjectRepository {
      * @param projectId identifiant du projet à récupérer.
      * @return projet récupéré
      */
-    public Project getProject(String projectId) {
-        return this.projectDao.getProject(projectId);
+    public Maybe<Project> getProject(String projectId) {
+        return this.projectDao.getProjectById(projectId);
     }
 }

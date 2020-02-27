@@ -28,9 +28,12 @@ import com.cleanup.todoc.models.Task;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * <p>Home activity of the application which is displayed when the user opens the app.</p>
@@ -142,7 +145,10 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
 
     @Override
     public void onDeleteTask(Task task) {
-        this.mainActivityViewModel.deleteTask(task);
+        this.mainActivityViewModel.deleteTask(task)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(integer -> Log.w("Main", String.format(Locale.getDefault(), "%d tâche(s) supprimée(s)", integer)), throwable -> Log.w("Main", throwable));
     }
 
     /**
@@ -173,7 +179,11 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
                 task.setCreationTimestamp(new Date().getTime());
                 task.setProjectId(taskProject.getId());
 
-                this.mainActivityViewModel.insertTask(task);
+                this.mainActivityViewModel.insertTask(task)
+                        .subscribeOn(Schedulers.computation())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(strings -> Log.w("Main", String.format(Locale.getDefault(), "%d tâche(s) insérée(s) en BDD", strings.size()))
+                                , throwable -> Log.w("Main", throwable));
 
                 dialogInterface.dismiss();
             }

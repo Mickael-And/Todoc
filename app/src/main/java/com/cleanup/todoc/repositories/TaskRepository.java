@@ -1,8 +1,6 @@
 package com.cleanup.todoc.repositories;
 
-import android.app.Application;
 import android.content.Context;
-import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
 
@@ -12,6 +10,8 @@ import com.cleanup.todoc.room.TaskDao;
 
 import java.util.List;
 
+import io.reactivex.Maybe;
+import io.reactivex.Single;
 import lombok.Getter;
 
 /**
@@ -32,16 +32,16 @@ public class TaskRepository {
 
     public TaskRepository(Context pContext) {
         this.taskDao = AppDataBase.getInstance(pContext).taskDao();
-        this.tasks = taskDao.getTasks();
+        this.tasks = this.taskDao.getTasks();
     }
 
     /**
-     * Permet l'insertion en BDD d'une tâche.
+     * Permet l'insertion en BDD d'une ou plusieurs tâches.
      *
-     * @param task tâche à persister
+     * @param tasks tâches à persister
      */
-    public void insertTask(Task task) {
-        new InsertAsyncTask(this.taskDao).execute(task);
+    public Single<List<Long>> insertTask(Task... tasks) {
+        return this.taskDao.insertTask(tasks);
     }
 
     /**
@@ -49,24 +49,8 @@ public class TaskRepository {
      *
      * @param tasks la ou les tâches à supprimer en BDD
      */
-    public void deleteTask(Task... tasks) {
-        this.taskDao.deleteTask(tasks);
+    public Single<Integer> deleteTask(Task... tasks) {
+        return this.taskDao.deleteTask(tasks);
     }
 
-    /**
-     * Classe permettant l'insertion d'une tâche en BDD de manière asynchrone.
-     */
-    private static class InsertAsyncTask extends AsyncTask<Task, Void, Void> {
-        private TaskDao mAsyncTaskDao;
-
-        InsertAsyncTask(TaskDao dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(final Task... tasks) {
-            mAsyncTaskDao.insertTask(tasks[0]);
-            return null;
-        }
-    }
 }

@@ -9,9 +9,15 @@ import androidx.room.Query;
 import com.cleanup.todoc.models.Project;
 
 import java.util.List;
+import java.util.Observable;
+
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
 
 /**
- * Dao des données de type {@link com.cleanup.todoc.models.Project}
+ * Dao des données de type {@link com.cleanup.todoc.models.Project}.
  */
 @Dao
 public interface ProjectDao {
@@ -22,13 +28,7 @@ public interface ProjectDao {
      * @param projects projets à insérer
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertProject(Project... projects);
-
-    /**
-     * Requête de suppression des projets en BDD.
-     */
-    @Query("DELETE FROM project")
-    void deleteAllProjects();
+    Single<List<Long>> insertProject(Project... projects);
 
     /**
      * Requête pour la récupération de la liste des projets en BDD sous forme observable.
@@ -45,5 +45,5 @@ public interface ProjectDao {
      * @return projet récupéré
      */
     @Query("SELECT * FROM project WHERE project_id = :projectId")
-    Project getProject(String projectId);
+    Maybe<Project> getProjectById(String projectId);
 }

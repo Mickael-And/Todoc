@@ -1,7 +1,7 @@
 package com.cleanup.todoc.room;
 
 import android.content.Context;
-import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.room.Database;
@@ -12,7 +12,12 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import com.cleanup.todoc.models.Project;
 import com.cleanup.todoc.models.Task;
 
+import java.util.Locale;
 import java.util.UUID;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Représente la base de données.
@@ -57,7 +62,6 @@ public abstract class AppDataBase extends RoomDatabase {
                     appDataBaseInstance = Room.databaseBuilder(pContext.getApplicationContext(), AppDataBase.class, DB_NAME)
                             .fallbackToDestructiveMigration()
                             .addCallback(callback)
-                            .allowMainThreadQueries()
                             .build();
                 }
             }
@@ -72,36 +76,16 @@ public abstract class AppDataBase extends RoomDatabase {
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
-            new PopulateDbAsync(appDataBaseInstance).execute();
+
+            Disposable disposable = appDataBaseInstance.projectDao().insertProject(new Project(UUID.randomUUID().toString(), "Projet Tartampion", 0xFFEADAD1),
+                    new Project(UUID.randomUUID().toString(), "Projet Lucidia", 0xFFB4CDBA),
+                    new Project(UUID.randomUUID().toString(), "Projet Circus", 0xFFA3CED2))
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(longs -> {
+                        System.out.println(longs);
+                        Log.w("Init Database", String.format(Locale.getDefault(), "%d projet(s) inséré(s)", longs.size()));
+                    }, throwable -> Log.w("Init Database", throwable));
         }
     };
-
-    /**
-     * Classe permettant l'initialisation de la BDD de manière asynchrone.
-     */
-    private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
-
-        private final TaskDao taskDao;
-        private final ProjectDao projectDao;
-
-        PopulateDbAsync(AppDataBase db) {
-            this.taskDao = db.taskDao();
-            this.projectDao = db.projectDao();
-        }
-
-        @Override
-        protected Void doInBackground(final Void... params) {
-            // Start the app with a clean database every time.
-            // Not needed if you only populate the database
-            // when it is first created
-            this.taskDao.deleteAllTasks();
-            this.projectDao.deleteAllProjects();
-
-            this.projectDao.insertProject(new Project(UUID.randomUUID().toString(), "Projet Tartampion", 0xFFEADAD1),
-                    new Project(UUID.randomUUID().toString(), "Projet Lucidia", 0xFFB4CDBA),
-                    new Project(UUID.randomUUID().toString(), "Projet Circus", 0xFFA3CED2));
-
-            return null;
-        }
-    }
 }

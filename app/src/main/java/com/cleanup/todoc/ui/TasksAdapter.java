@@ -11,13 +11,14 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cleanup.todoc.R;
-import com.cleanup.todoc.models.Project;
 import com.cleanup.todoc.models.Task;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * <p>Adapter which handles the list of tasks to display in the dedicated RecyclerView.</p>
@@ -80,14 +81,17 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
         taskViewHolder.lblTaskName.setText(task.getName());
         taskViewHolder.imgDelete.setTag(task);
 
-        final Project taskProject = mainActivityViewModel.getProject(task.getProjectId());
-        if (taskProject != null) {
-            taskViewHolder.imgProject.setSupportImageTintList(ColorStateList.valueOf(taskProject.getColor()));
-            taskViewHolder.lblProjectName.setText(taskProject.getName());
-        } else {
-            taskViewHolder.imgProject.setVisibility(View.INVISIBLE);
-            taskViewHolder.lblProjectName.setText("");
-        }
+        this.mainActivityViewModel.getProject(task.getProjectId())
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnComplete(() -> {
+                    taskViewHolder.imgProject.setVisibility(View.INVISIBLE);
+                    taskViewHolder.lblProjectName.setText("");
+                })
+                .subscribe(project -> {
+                    taskViewHolder.imgProject.setSupportImageTintList(ColorStateList.valueOf(project.getColor()));
+                    taskViewHolder.lblProjectName.setText(project.getName());
+                });
 
         taskViewHolder.imgDelete.setOnClickListener(view -> {
             final Object tag = view.getTag();
