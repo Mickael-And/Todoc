@@ -54,7 +54,7 @@ public class MainActivityViewModel extends ViewModel {
      * @param task tâches à insérer
      * @return la liste des identifiants des tâches insérées en BDD
      */
-    Single<List<Long>> insertTask(Task task) {
+    public Single<List<Long>> insertTask(Task task) {
         return this.taskRepository.insertTask(task);
     }
 
@@ -64,7 +64,7 @@ public class MainActivityViewModel extends ViewModel {
      * @param tasks tâches à supprimer.
      * @return le nombre de tâche(s) supprimée(s)
      */
-    Single<Integer> deleteTask(Task... tasks) {
+    public Single<Integer> deleteTask(Task... tasks) {
         return this.taskRepository.deleteTask(tasks);
     }
 
@@ -74,7 +74,7 @@ public class MainActivityViewModel extends ViewModel {
      * @param projectId identifiant du projet à récupérer
      * @return projet récupéré
      */
-    Maybe<Project> getProject(String projectId) {
+    public Maybe<Project> getProject(String projectId) {
         return this.projectRepository.getProject(projectId);
     }
 }

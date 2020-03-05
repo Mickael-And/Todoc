@@ -10,7 +10,6 @@ import androidx.test.rule.ActivityTestRule;
 import com.cleanup.todoc.ui.MainActivity;
 import com.cleanup.todoc.utils.TestUtils;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,10 +20,13 @@ import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static com.cleanup.todoc.utils.TestUtils.atPosition;
 import static com.cleanup.todoc.utils.TestUtils.clickChildView;
+import static com.cleanup.todoc.utils.TestUtils.waitFor;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -36,13 +38,13 @@ import static org.junit.Assert.assertThat;
  */
 @RunWith(AndroidJUnit4.class)
 public class MainActivityInstrumentedTest {
-
     @Rule
     public ActivityTestRule<MainActivity> rule = new ActivityTestRule<>(MainActivity.class);
 
-    @Before
-    public void setup() {
-
+    @Test
+    public void filterAlertDialogIsLaunching() {
+        onView(withId(R.id.fab_add_task)).perform(click());
+        onView(withText(R.string.add_task)).check(matches(isDisplayed()));
     }
 
     @Test
@@ -65,19 +67,7 @@ public class MainActivityInstrumentedTest {
         assertThat(listTasks.getAdapter().getItemCount(), equalTo(sizeList + 1));
 
         onView(withId(R.id.list_tasks)).perform(actionOnItemAtPosition(sizeList, clickChildView(R.id.img_delete)));
-
-//        IdlingPolicies.setMasterPolicyTimeout(DateUtils.SECOND_IN_MILLIS * 2, TimeUnit.MILLISECONDS);
-//        IdlingPolicies.setIdlingResourceTimeout(DateUtils.SECOND_IN_MILLIS * 2, TimeUnit.MILLISECONDS);
-//
-//        ElapsedTimeIdlingResource elapsedTimeIdlingResource = new ElapsedTimeIdlingResource(DateUtils.SECOND_IN_MILLIS * 2);
-//        IdlingRegistry.getInstance().register(elapsedTimeIdlingResource);
-
-        try {
-            Thread.sleep(2000);// TODO: Utiliser Idlingressource pour attendre le traitement asynchrone en BDD
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+        onView(isRoot()).perform(waitFor(1000));
         if (sizeList != 0) {
             assertThat(lblNoTask.getVisibility(), equalTo(View.GONE));
             assertThat(listTasks.getVisibility(), equalTo(View.VISIBLE));
@@ -87,8 +77,15 @@ public class MainActivityInstrumentedTest {
             assertThat(lblNoTask.getVisibility(), equalTo(View.VISIBLE));
             assertThat(listTasks.getVisibility(), equalTo(View.GONE));
         }
+    }
 
-//        IdlingRegistry.getInstance().unregister(elapsedTimeIdlingResource);
+    @Test
+    public void overflowMenuContainFourItems() {
+        onView(withId(R.id.action_filter)).perform(click());
+        onView(withText(R.string.sort_alphabetical)).check(matches(isDisplayed()));
+        onView(withText(R.string.sort_alphabetical_invert)).check(matches(isDisplayed()));
+        onView(withText(R.string.sort_oldest_first)).check(matches(isDisplayed()));
+        onView(withText(R.string.sort_recent_first)).check(matches(isDisplayed()));
     }
 
     @Test
@@ -109,10 +106,8 @@ public class MainActivityInstrumentedTest {
 
         int sizeList = listTasks.getAdapter().getItemCount();
 
-
         // Filtre ancien -> récent de base
         onView(withId(R.id.list_tasks)).check((matches(atPosition(sizeList - 1, hasDescendant(withText("hhh Tâche example"))))));
-
 
         // Sort alphabetical
         onView(withId(R.id.action_filter)).perform(click());
@@ -136,21 +131,9 @@ public class MainActivityInstrumentedTest {
         onView(withText(R.string.sort_recent_first)).perform(click());
         onView(withId(R.id.list_tasks)).check((matches(atPosition(0, hasDescendant(withText("hhh Tâche example"))))));
 
-//        IdlingPolicies.setMasterPolicyTimeout(DateUtils.SECOND_IN_MILLIS * 2, TimeUnit.MILLISECONDS);
-//        IdlingPolicies.setIdlingResourceTimeout(DateUtils.SECOND_IN_MILLIS * 2, TimeUnit.MILLISECONDS);
-
         for (int i = 0; i < 3; i++) {
             onView(withId(R.id.list_tasks)).perform(actionOnItemAtPosition(0, clickChildView(R.id.img_delete)));
-//            ElapsedTimeIdlingResource elapsedTimeIdlingResource = new ElapsedTimeIdlingResource(DateUtils.SECOND_IN_MILLIS * 2);
-//            IdlingRegistry.getInstance().register(elapsedTimeIdlingResource);
-//            IdlingRegistry.getInstance().unregister(elapsedTimeIdlingResource);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) { // TODO: Modifier avec IdlingRessource
-                e.printStackTrace();
-            }
+            onView(isRoot()).perform(waitFor(1000));
         }
-
-
     }
 }

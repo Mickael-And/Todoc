@@ -1,16 +1,27 @@
 package com.cleanup.todoc;
 
-import com.cleanup.todoc.models.Task;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
+import com.cleanup.todoc.models.Task;
+import com.cleanup.todoc.repositories.ProjectRepository;
+import com.cleanup.todoc.repositories.TaskRepository;
+import com.cleanup.todoc.ui.MainActivityViewModel;
+
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for tasks
@@ -18,24 +29,65 @@ import static org.junit.Assert.assertSame;
  * @author Gaëtan HERFRAY
  */
 public class TaskUnitTest {
-    @Test
-    public void test_projects() {
-        final Task task1 = new Task(1, 1, "task 1", new Date().getTime());
-        final Task task2 = new Task(2, 2, "task 2", new Date().getTime());
-        final Task task3 = new Task(3, 3, "task 3", new Date().getTime());
-        final Task task4 = new Task(4, 4, "task 4", new Date().getTime());
 
-        assertEquals("Projet Tartampion", task1.getProject().getName());
-        assertEquals("Projet Lucidia", task2.getProject().getName());
-        assertEquals("Projet Circus", task3.getProject().getName());
-        assertNull(task4.getProject());
+    private MainActivityViewModel mainActivityViewModel;
+
+    @Mock
+    TaskRepository taskRepository;
+    @Mock
+    ProjectRepository projectRepository;
+
+    private LiveData projects;
+
+    private LiveData tasks;
+
+
+    @Before
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+        projects = new MutableLiveData();
+        tasks = new MutableLiveData();
+        when(taskRepository.getTasks()).thenReturn(tasks);
+        when(projectRepository.getProjects()).thenReturn(projects);
+        this.mainActivityViewModel = new MainActivityViewModel(taskRepository, projectRepository);
+    }
+
+    @Test
+    public void vmGetProjetById() {
+        String id = UUID.randomUUID().toString();
+        this.mainActivityViewModel.getProject(id);
+        verify(projectRepository, times(1)).getProject(id);
+    }
+
+    @Test
+    public void vmInsertTask() {
+        Task task = new Task();
+        this.mainActivityViewModel.insertTask(task);
+        verify(taskRepository, times(1)).insertTask(task);
+    }
+
+    @Test
+    public void vmDeleteTask() {
+        Task task = new Task();
+        this.mainActivityViewModel.deleteTask(task);
+        verify(taskRepository, times(1)).deleteTask(task);
+    }
+
+    @Test
+    public void vmGetProjects() {
+        assertSame(projects, this.mainActivityViewModel.getProjects());
+    }
+
+    @Test
+    public void vmGetTasks() {
+        assertSame(tasks, this.mainActivityViewModel.getTasks());
     }
 
     @Test
     public void test_az_comparator() {
-        final Task task1 = new Task(1, 1, "aaa", 123);
-        final Task task2 = new Task(2, 2, "zzz", 124);
-        final Task task3 = new Task(3, 3, "hhh", 125);
+        final Task task1 = new Task(UUID.randomUUID().toString(), "aaa", new Date().getTime(), UUID.randomUUID().toString());
+        final Task task2 = new Task(UUID.randomUUID().toString(), "zzz", new Date().getTime(), UUID.randomUUID().toString());
+        final Task task3 = new Task(UUID.randomUUID().toString(), "hhh", new Date().getTime(), UUID.randomUUID().toString());
 
         final ArrayList<Task> tasks = new ArrayList<>();
         tasks.add(task1);
@@ -50,9 +102,9 @@ public class TaskUnitTest {
 
     @Test
     public void test_za_comparator() {
-        final Task task1 = new Task(1, 1, "aaa", 123);
-        final Task task2 = new Task(2, 2, "zzz", 124);
-        final Task task3 = new Task(3, 3, "hhh", 125);
+        final Task task1 = new Task(UUID.randomUUID().toString(), "aaa", new Date().getTime(), UUID.randomUUID().toString());
+        final Task task2 = new Task(UUID.randomUUID().toString(), "zzz", new Date().getTime(), UUID.randomUUID().toString());
+        final Task task3 = new Task(UUID.randomUUID().toString(), "hhh", new Date().getTime(), UUID.randomUUID().toString());
 
         final ArrayList<Task> tasks = new ArrayList<>();
         tasks.add(task1);
@@ -67,9 +119,9 @@ public class TaskUnitTest {
 
     @Test
     public void test_recent_comparator() {
-        final Task task1 = new Task(1, 1, "aaa", 123);
-        final Task task2 = new Task(2, 2, "zzz", 124);
-        final Task task3 = new Task(3, 3, "hhh", 125);
+        final Task task1 = new Task(UUID.randomUUID().toString(), "aaa", 123, UUID.randomUUID().toString());
+        final Task task2 = new Task(UUID.randomUUID().toString(), "zzz", 124, UUID.randomUUID().toString());
+        final Task task3 = new Task(UUID.randomUUID().toString(), "hhh", 125, UUID.randomUUID().toString());
 
         final ArrayList<Task> tasks = new ArrayList<>();
         tasks.add(task1);
@@ -84,9 +136,9 @@ public class TaskUnitTest {
 
     @Test
     public void test_old_comparator() {
-        final Task task1 = new Task(1, 1, "aaa", 123);
-        final Task task2 = new Task(2, 2, "zzz", 124);
-        final Task task3 = new Task(3, 3, "hhh", 125);
+        final Task task1 = new Task(UUID.randomUUID().toString(), "aaa", 123, UUID.randomUUID().toString());
+        final Task task2 = new Task(UUID.randomUUID().toString(), "zzz", 124, UUID.randomUUID().toString());
+        final Task task3 = new Task(UUID.randomUUID().toString(), "hhh", 125, UUID.randomUUID().toString());
 
         final ArrayList<Task> tasks = new ArrayList<>();
         tasks.add(task1);

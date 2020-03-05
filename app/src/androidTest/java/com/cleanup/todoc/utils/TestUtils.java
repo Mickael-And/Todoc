@@ -11,6 +11,8 @@ import androidx.test.espresso.matcher.BoundedMatcher;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.espresso.util.HumanReadables;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.util.TreeIterables;
+
 import android.view.View;
 
 import com.cleanup.todoc.RecyclerViewMatcher;
@@ -19,7 +21,11 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
+import java.util.concurrent.TimeoutException;
+
 import static androidx.test.espresso.core.internal.deps.guava.base.Preconditions.checkNotNull;
+import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -27,36 +33,6 @@ import static org.junit.Assert.assertThat;
  * Created by dannyroa on 5/9/15.
  */
 public class TestUtils {
-
-
-    public static RecyclerViewMatcher withRecyclerView(final int recyclerViewId) {
-
-        return new RecyclerViewMatcher(recyclerViewId);
-    }
-
-
-    private static final class ScrollToPositionViewAction implements ViewAction {
-        private final int position;
-
-        private ScrollToPositionViewAction(int position) {
-            this.position = position;
-        }
-
-        public Matcher<View> getConstraints() {
-            return Matchers.allOf(new Matcher[]{
-                    ViewMatchers.isAssignableFrom(RecyclerView.class), ViewMatchers.isDisplayed()
-            });
-        }
-
-        public String getDescription() {
-            return "scroll RecyclerView to position: " + this.position;
-        }
-
-        public void perform(UiController uiController, View view) {
-            RecyclerView recyclerView = (RecyclerView) view;
-            recyclerView.scrollToPosition(this.position);
-        }
-    }
 
     /**
      * Fourni une {@link ViewAction} permettant de cliquer sur une vue à l'intérieur d'un item de la RecyclerView.
@@ -83,6 +59,7 @@ public class TestUtils {
             }
         };
     }
+
     /**
      * Permet de réaliser un test sur un item d'une {@link RecyclerView}.
      *
@@ -133,4 +110,25 @@ public class TestUtils {
         }
     }
 
+    /**
+     * Perform action of waiting for a specific time.
+     */
+    public static ViewAction waitFor(final long millis) {
+        return new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return isRoot();
+            }
+
+            @Override
+            public String getDescription() {
+                return "Wait for " + millis + " milliseconds.";
+            }
+
+            @Override
+            public void perform(UiController uiController, final View view) {
+                uiController.loopMainThreadForAtLeast(millis);
+            }
+        };
+    }
 }
