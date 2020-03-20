@@ -11,9 +11,6 @@ import com.cleanup.todoc.models.Task;
 
 import java.util.List;
 
-import io.reactivex.Completable;
-import io.reactivex.Flowable;
-import io.reactivex.Maybe;
 import io.reactivex.Single;
 
 /**

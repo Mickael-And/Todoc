@@ -58,26 +58,6 @@ public class Task {
     private String projectId;
 
     /**
-     * Comparator to sort task from A to Z
-     */
-    public static class TaskAZComparator implements Comparator<Task> {
-        @Override
-        public int compare(Task left, Task right) {
-            return left.name.compareTo(right.name);
-        }
-    }
-
-    /**
-     * Comparator to sort task from Z to A
-     */
-    public static class TaskZAComparator implements Comparator<Task> {
-        @Override
-        public int compare(Task left, Task right) {
-            return right.name.compareTo(left.name);
-        }
-    }
-
-    /**
      * Comparator to sort task from last created to first created
      */
     public static class TaskRecentComparator implements Comparator<Task> {

@@ -6,6 +6,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.util.Comparator;
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -53,5 +54,25 @@ public class Project {
     @NonNull
     public String toString() {
         return getName();
+    }
+
+    /**
+     * Comparator to sort project from A to Z.
+     */
+    public static class ProjectAZComparator implements Comparator<Project> {
+        @Override
+        public int compare(Project o1, Project o2) {
+            return o1.name.compareTo(o2.name);
+        }
+    }
+
+    /**
+     * Comparator to sort project from Z to A.
+     */
+    public static class ProjectZAComparator implements Comparator<Project> {
+        @Override
+        public int compare(Project o1, Project o2) {
+            return o2.name.compareTo(o1.name);
+        }
     }
 }

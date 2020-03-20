@@ -8,6 +8,8 @@ import com.cleanup.todoc.models.Task;
 import com.cleanup.todoc.repositories.ProjectRepository;
 import com.cleanup.todoc.repositories.TaskRepository;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Maybe;
@@ -76,5 +78,60 @@ public class MainActivityViewModel extends ViewModel {
      */
     public Maybe<Project> getProject(String projectId) {
         return this.projectRepository.getProject(projectId);
+    }
+
+    /**
+     * Tri les tâches par nom de projet de A à Z.
+     *
+     * @param tasks tâches à trier.
+     * @return tâches triées par nom de projet de A à Z
+     */
+    List<Task> getTasksByAZProject(List<Task> tasks) {
+        List<Task> orderedTasks = new ArrayList<>();
+        if (this.projects.getValue() != null) {
+            List<Project> projects = this.projects.getValue();
+            Collections.sort(projects, new Project.ProjectAZComparator());
+            Collections.sort(tasks, new Task.TaskOldComparator());
+            this.sortTasksByProjects(projects, tasks, orderedTasks);
+        } else {
+            orderedTasks = tasks;
+        }
+        return orderedTasks;
+    }
+
+    /**
+     * Tri les tâches par nom de projet de Z à A.
+     *
+     * @param tasks tâches à trier.
+     * @return tâches triées par nom de projet de Z à A
+     */
+    List<Task> getTasksByZAProject(List<Task> tasks) {
+        List<Task> orderedTasks = new ArrayList<>();
+        if (this.projects.getValue() != null) {
+            List<Project> projects = this.projects.getValue();
+            Collections.sort(projects, new Project.ProjectZAComparator());
+            Collections.sort(tasks, new Task.TaskOldComparator());
+            this.sortTasksByProjects(projects, tasks, orderedTasks);
+        } else {
+            orderedTasks = tasks;
+        }
+        return orderedTasks;
+    }
+
+    /**
+     * Tri les tâches par projets.
+     *
+     * @param pProjects     projets pour le tri
+     * @param pTasks        tâches à trier
+     * @param pOrderedTasks liste pour les tâches triées
+     */
+    private void sortTasksByProjects(List<Project> pProjects, List<Task> pTasks, List<Task> pOrderedTasks) {
+        for (Project project : pProjects) {
+            for (Task task : pTasks) {
+                if (task.getProjectId().equals(project.getId())) {
+                    pOrderedTasks.add(task);
+                }
+            }
+        }
     }
 }

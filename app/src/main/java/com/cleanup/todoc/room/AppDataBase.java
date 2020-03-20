@@ -83,7 +83,6 @@ public abstract class AppDataBase extends RoomDatabase {
                     .subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(longs -> {
-                        System.out.println(longs);
                         Log.w("Init Database", String.format(Locale.getDefault(), "%d projet(s) inséré(s)", longs.size()));
                     }, throwable -> Log.w("Init Database", throwable));
         }

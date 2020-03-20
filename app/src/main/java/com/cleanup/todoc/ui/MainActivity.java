@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
             default:
                 sortMethod = SortMethod.NONE;
                 Log.i(this.getClass().getName(), "Filtre inconnue");
-                break;
+                return super.onOptionsItemSelected(item);
         }
 
         if (this.mainActivityViewModel.getTasks().getValue() != null) {
@@ -231,10 +231,10 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
             listTasks.setVisibility(View.VISIBLE);
             switch (sortMethod) {
                 case ALPHABETICAL:
-                    Collections.sort(tasks, new Task.TaskAZComparator());
+                    tasks = this.mainActivityViewModel.getTasksByAZProject(tasks);
                     break;
                 case ALPHABETICAL_INVERTED:
-                    Collections.sort(tasks, new Task.TaskZAComparator());
+                    tasks = this.mainActivityViewModel.getTasksByZAProject(tasks);
                     break;
                 case RECENT_FIRST:
                     Collections.sort(tasks, new Task.TaskRecentComparator());
